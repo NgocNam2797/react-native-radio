@@ -38,6 +38,7 @@
      outerColor: PropTypes.string,
      innerColor: PropTypes.string,
      onPress: PropTypes.func,
+     fontSize: PropTypes.number
    };
  
    static defaultProps = {
@@ -49,7 +50,8 @@
      itemRealKey: 'value',
      circleSize: 20,
      outerColor: '#E4E4E4',
-     innerColor: '#06B050'
+     innerColor: '#06B050',
+     fontSize:16
    };
  
    componentDidMount() {
@@ -74,7 +76,7 @@
    }
  
    renderRadioItem(item, i) {
-     const { itemShowKey } = this.props;
+     const { itemShowKey,fontSize } = this.props;
      let isSelected = false;
      const {slectRadio}=this.state;
      if (this.state.is_active_index === i&&slectRadio) {
@@ -94,7 +96,7 @@
            <View
              style={{ marginLeft: 3 }}
            >
-             <Text style={{fontSize:16, color:'#1D1D1D'}}>{'' + item[itemShowKey]}</Text>
+             <Text style={{fontSize:fontSize, color:'#1D1D1D'}}>{'' + item[itemShowKey]}</Text>
            </View>
          </View>
        </TouchableWithoutFeedback>
