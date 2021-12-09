@@ -22,7 +22,7 @@
      this.renderRadioCircle = this.renderRadioCircle.bind(this);
      this.renderRadioItem = this.renderRadioItem.bind(this);
      this.state = {
-       is_active_index: props.initial,
+       is_active_index:null,
        slectRadio:false
      };
    }
@@ -43,7 +43,7 @@
  
    static defaultProps = {
      dataSource: [],
-     initial: 0,
+     initial: '',
      formHorizontal: false,
      labelHorizontal: true,
      itemShowKey: 'label',
@@ -58,8 +58,10 @@
      const { itemShowKey, itemRealKey, initial, dataSource } = this.props;
      if (typeof (initial) === 'number') return;
      dataSource.map((item, i) => { // eslint-disable-line
-       if ((item[itemShowKey] === initial || item[itemRealKey] === initial)) {
-         this.setState({ is_active_index: i });
+       if(item.active){
+         this.setState({
+           is_active_index:i
+         })
          return i;
        }
      });
@@ -79,7 +81,10 @@
      const { itemShowKey,fontSize } = this.props;
      let isSelected = false;
      const {slectRadio}=this.state;
-     if (this.state.is_active_index === i&&slectRadio) {
+     if (this.state.is_active_index === i&&slectRadio&&!item.active) {
+       isSelected = true;
+     }
+     if(this.state.is_active_index === i&&!slectRadio&&item.active){
        isSelected = true;
      }
  
