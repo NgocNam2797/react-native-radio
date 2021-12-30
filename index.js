@@ -38,7 +38,9 @@
      outerColor: PropTypes.string,
      innerColor: PropTypes.string,
      onPress: PropTypes.func,
-     fontSize: PropTypes.number
+     fontSize: PropTypes.number,
+     alarm: PropTypes.bool,
+     isActived: PropTypes.bool
    };
  
    static defaultProps = {
@@ -51,18 +53,26 @@
      circleSize: 20,
      outerColor: '#E4E4E4',
      innerColor: '#06B050',
-     fontSize:16
+     fontSize:16,
+     alarm: false,
+     isActived: false
    };
  
    componentDidMount() {
      const { itemShowKey, itemRealKey, initial, dataSource } = this.props;
+     console.log('initialinitialinitialinitial',initial);
      if (typeof (initial) === 'number') return;
-     dataSource.map((item, i) => { // eslint-disable-line
+     dataSource.map((item, i) => { 
        if(item.active){
          this.setState({
            is_active_index:i
          })
          return i;
+       }else{
+        if ((item[itemShowKey] === initial)) {
+          this.setState({ is_active_index: i });
+          return i;
+        }
        }
      });
    }
@@ -72,24 +82,36 @@
        slectRadio:true,
        is_active_index: index,
      });
-     if (this.props.onPress) {
-       this.props.onPress(item, index);
+     const {alarm,onChangeData}=this.props;
+     if(alarm&&onChangeData){
+      this.props.onChangeData(item, index);
+     }else{
+      if (this.props.onPress) {
+        this.props.onPress(item, index);
+      }
      }
    }
  
    renderRadioItem(item, i) {
-     const { itemShowKey,fontSize } = this.props;
+     const { itemShowKey, fontSize, alarm , isActived,itemRealKey} = this.props;
      let isSelected = false;
-     const {slectRadio}=this.state;
-     if (this.state.is_active_index === i&&slectRadio&&!item.active) {
-       isSelected = true;
+     const { slectRadio } = this.state;
+     if (!alarm) {
+       if (this.state.is_active_index === i && slectRadio && !item.active) {
+         isSelected = true;
+       }
+       if (this.state.is_active_index === i && !slectRadio && item.active) {
+         isSelected = true;
+       }
+     } else {
+       if (this.state.is_active_index === i) {
+         isSelected = true;
+       }
      }
-     if(this.state.is_active_index === i&&!slectRadio&&item.active){
-       isSelected = true;
-     }
- 
+
      return (
        <TouchableWithoutFeedback
+       disabled={!isActived}
          key={i}
          onPress={() => this._onPress(item, i)}
        >
@@ -97,18 +119,30 @@
            style={{ padding: 3.5, flexDirection: this.props.labelHorizontal ? 'row' : 'column',
            justifyContent: 'center', alignItems: 'center' }}
          >
-           {this.renderRadioCircle(isSelected)}
+           {this.renderRadioCircle(isSelected,isActived)}
            <View
              style={{ marginLeft: 3 }}
            >
-             <Text style={{fontSize:fontSize, color:'#1D1D1D'}}>{'' + item[itemShowKey]}</Text>
+             <Text style={{fontSize:fontSize, color:'#1D1D1D'}}>{'' + item[itemRealKey]}</Text>
            </View>
          </View>
        </TouchableWithoutFeedback>
      );
    }
- 
-   renderRadioCircle(isSelected) {
+   getBackgroundColorOne = (isSelected, isActived) => {
+     if (!isActived && isSelected) {
+       return 'gray'
+     }
+   }
+
+   getBackgroundColorTwo = (isSelected) => {
+     if (isSelected) {
+       return this.props.innerColor
+     }
+     return 'transparent'
+   }
+
+   renderRadioCircle(isSelected,isActived) {
      const outerSize = this.props.circleSize > 11 ? this.props.circleSize : 11;
      const innerSize = this.props.circleSize - 7;
      return (
@@ -117,8 +151,8 @@
           borderRadius: outerSize / 2, borderWidth: 2, borderColor: this.props.outerColor }}
        >
          <View
-           style={{ width: innerSize, height: innerSize, borderRadius: innerSize / 2,
-            backgroundColor: isSelected ? this.props.innerColor : 'transparent' }}
+           style={{ width: innerSize, height: innerSize, borderRadius:  innerSize / 2, borderWidth:1, borderColor:'white',
+            backgroundColor:!isActived?this.getBackgroundColorOne(isSelected,isActived):this.getBackgroundColorTwo(isSelected)}}
          />
        </View>
      );
